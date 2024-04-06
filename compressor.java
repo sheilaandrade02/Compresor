@@ -3,30 +3,34 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 
-
 public class compressor {
     public static void main(String[] args) {
         // Ruta del archivo de audio de entrada
-        String inputFile = "assets/campanes10s.wav";
+        String inputFile = "C:/Users/marti/desktop/compresor/campanes10s.wav";
+
         // Número de muestras por bloque
-        int blockSize = 512; // Por ejemplo, 512 muestras por bloque
+        int blockSize = 1000; // Por ejemplo, 512 muestras por bloque
+
+        // Umbral para determinar el silencio (ajústalo según sea necesario)
+        double silenceThreshold = 0.1;
 
         // Llamada a la función de preprocesamiento
         try {
-            preprocessAudio(inputFile, blockSize);
+            preprocessAudio(inputFile, blockSize, silenceThreshold);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void preprocessAudio(String inputFile, int blockSize) throws Exception {
+    public static void preprocessAudio(String inputFile, int blockSize, double silenceThreshold) throws Exception {
         // Cargar el archivo de audio
         File audioFile = new File(inputFile);
         AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(audioFile);
 
         // Obtener la información del formato de audio
         AudioFormat format = audioInputStream.getFormat();
-        System.out.println("Formato de audio: "+format);
+        System.out.println("Formato de audio: " + format);
+
         // Verificar si el formato es PCM
         if (format.getEncoding() != AudioFormat.Encoding.PCM_SIGNED) {
             throw new IllegalArgumentException("El archivo de audio debe estar en formato PCM");
@@ -35,21 +39,41 @@ public class compressor {
         // Definir un buffer para leer las muestras del archivo de audio
         byte[] buffer = new byte[blockSize * format.getFrameSize()];
 
-
         // Leer el audio por bloques
         int bytesRead;
         while ((bytesRead = audioInputStream.read(buffer)) != -1) {
             // Procesar el bloque de muestras aquí
             // buffer contiene las muestras de audio leídas
 
-            // Ejemplo: Imprimir el número de bytes leídos en este bloque
-            System.out.println("Bytes leídos: " + bytesRead);
+            // Verificar si el bloque es silencioso
+            boolean isSilent = isSilent(buffer, silenceThreshold);
+
+            if (isSilent) {
+                System.out.println("Bloque de audio silencioso");
+            } else {
+                System.out.println("Bloque de audio no silencioso");
+            }
         }
 
         // Cerrar el flujo de entrada de audio
         audioInputStream.close();
     }
 
+    public static boolean isSilent(byte[] buffer, double silenceThreshold) {
+        // Calcular el promedio de las amplitudes de las muestras en el bloque
+        double sum = 0.0;
+        for (byte sample : buffer) {
+            // Convertir el byte a un valor de amplitud en el rango [-1, 1]
+            double amplitude = (double) sample / Byte.MAX_VALUE;
+            sum += Math.abs(amplitude);
+        }
+        double averageAmplitude = sum / buffer.length;
+
+        // Verificar si el promedio de amplitudes está por debajo del umbral de silencio
+        return averageAmplitude < silenceThreshold;
+    }
+}
+/* 
     public static double[] dct(double[] input) {
         int N = input.length;
         double[] output = new double[N];
@@ -68,4 +92,4 @@ public class compressor {
 
         return output;
     }
-}
+}*/
