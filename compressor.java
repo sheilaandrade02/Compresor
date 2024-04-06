@@ -50,16 +50,21 @@ public class compressor {
 
             if (isSilent) {
                 System.out.println("Bloque de audio silencioso");
+            } else {
+                System.out.println("Bloque de audio no silencioso");
+
                 // Aplicar la Transformada Coseno Discreta (DCT) al bloque
                 double[] dctCoefficients = applyDCT(buffer);
 
-                // Hacer algo con los coeficientes de DCT, por ejemplo, imprimirlos
-                System.out.println("Coeficientes de DCT:");
-                for (double coefficient : dctCoefficients) {
-                   // System.out.print(coefficient + " ");
+                // Cuantificar los coeficientes de la DCT
+                double[] quantizedCoefficients = quantize(dctCoefficients);
+
+                // Hacer algo con los coeficientes cuantificados, por ejemplo, imprimirlos
+                System.out.println("Coeficientes cuantificados:");
+                for (double coefficient : quantizedCoefficients) {
+                    System.out.print(coefficient + " ");
                 }
-            } else {
-                System.out.println("Bloque de audio no silencioso");
+                System.out.println();
             }
         }
 
@@ -94,6 +99,16 @@ public class compressor {
         }
 
         return dctCoefficients;
+    }
+    public static double[] quantize(double[] dctCoefficients) {
+        // Aquí implementarías la cuantificación de los coeficientes de la DCT
+        // Por ejemplo, podrías dividir cada coeficiente por un valor de cuantificación específico y luego redondearlo al entero más cercano
+        // Esto reducirá la precisión de los coeficientes
+        double[] quantizedCoefficients = new double[dctCoefficients.length];
+        for (int i = 0; i < dctCoefficients.length; i++) {
+            quantizedCoefficients[i] = Math.round(dctCoefficients[i]); // Ejemplo de cuantificación: redondear al entero más cercano
+        }
+        return quantizedCoefficients;
     }
 }
 /* 
