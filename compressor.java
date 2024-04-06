@@ -6,7 +6,7 @@ import javax.sound.sampled.AudioSystem;
 public class compressor {
     public static void main(String[] args) {
         // Ruta del archivo de audio de entrada
-        String inputFile = "C:/Users/marti/desktop/compresor/campanes10s.wav";
+        String inputFile = "assets/campanes10s.wav";
 
         // Número de muestras por bloque
         int blockSize = 1000; // Por ejemplo, 512 muestras por bloque
@@ -50,6 +50,14 @@ public class compressor {
 
             if (isSilent) {
                 System.out.println("Bloque de audio silencioso");
+                // Aplicar la Transformada Coseno Discreta (DCT) al bloque
+                double[] dctCoefficients = applyDCT(buffer);
+
+                // Hacer algo con los coeficientes de DCT, por ejemplo, imprimirlos
+                System.out.println("Coeficientes de DCT:");
+                for (double coefficient : dctCoefficients) {
+                   // System.out.print(coefficient + " ");
+                }
             } else {
                 System.out.println("Bloque de audio no silencioso");
             }
@@ -71,6 +79,21 @@ public class compressor {
 
         // Verificar si el promedio de amplitudes está por debajo del umbral de silencio
         return averageAmplitude < silenceThreshold;
+    }
+    public static double[] applyDCT(byte[] buffer) {
+        int N = buffer.length;
+        double[] dctCoefficients = new double[N];
+
+        // Aplicar la DCT al bloque de muestras
+        for (int k = 0; k < N; k++) {
+            double sum = 0.0;
+            for (int n = 0; n < N; n++) {
+                sum += buffer[n] * Math.cos(Math.PI * k * (2 * n + 1) / (2.0 * N));
+            }
+            dctCoefficients[k] = sum;
+        }
+
+        return dctCoefficients;
     }
 }
 /* 
