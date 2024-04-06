@@ -9,7 +9,7 @@ public class compressor {
         String inputFile = "C:/Users/marti/desktop/compresor/campanes10s.wav";
 
         // Número de muestras por bloque
-        int blockSize = 10002; // Por ejemplo, 512 muestras por bloque
+        int blockSize = 1000; // Por ejemplo, 512 muestras por bloque
 
         // Umbral para determinar el silencio (ajústalo según sea necesario)
         double silenceThreshold = 0.1;
